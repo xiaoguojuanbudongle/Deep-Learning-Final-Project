@@ -65,42 +65,85 @@ The following results were obtained from an evaluation run using a **Real LLM AP
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/llm-security-framework.git
-   cd llm-security-framework
+   git clone https://github.com/gavinn212/Deep-Learning-Final-Project.git
+   cd Deep-Learning-Final-Project
    ```
 
 2. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
+## Configuration
+
+This project supports two primary modes of operation: using a **Real LLM API** (recommended for accurate results) or a **Mock System** (for zero-cost testing).
+
+### 1. Real LLM API Configuration
+
+To evaluate against real models, you need to configure `config.py`.
+
+1.  Open `config.py` in the root directory.
+2.  Select your API provider by setting the `USE_API` variable to either `"openai"` or `"qwen"`.
+3.  Fill in the corresponding API key and model details.
+
+**Example for OpenAI:**
+```python
+# config.py
+USE_API = "openai"
+OPENAI_API_KEY = "sk-..."  # Replace with your actual key
+OPENAI_MODEL = "gpt-3.5-turbo"
+```
+
+**Example for Qwen (Aliyun):**
+```python
+# config.py
+USE_API = "qwen"
+QWEN_API_KEY = "sk-..."    # Replace with your actual key
+QWEN_API_BASE = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+QWEN_MODEL = "qwen-flash"
+```
+
+### 2. Mock System Configuration
+
+The Mock System simulates an LLM using rule-based logic. It is useful for debugging the pipeline without incurring API costs.
+
+- No `config.py` changes are strictly required, but you can adjust `vulnerability` via command-line arguments (see Usage below).
+- The mock system has a built-in "vulnerability level" that determines how likely it is to fall for a specific attack pattern.
 
 ## Usage
 
-### Running an Evaluation
+### Method A: Running with Real API (Recommended)
 
-To run a full security evaluation benchmark:
+Once you have configured `config.py` with your API keys:
 
 ```bash
 python experiments/run_evaluation.py
 ```
+*This will connect to the configured endpoint (OpenAI or Qwen), run all attacks, and generate results.*
 
-### Options
+### Method B: Running with Mock System
 
-You can customize the evaluation using command-line arguments:
+To run the evaluation using the simulated local system (bypassing `config.py` API settings):
 
-- **Use Mock System** (No API costs):
-  ```bash
-  python experiments/run_evaluation.py --use-mock
-  ```
+```bash
+python experiments/run_evaluation.py --use-mock
+```
 
-- **Set Mock Vulnerability Level** (0.0 to 1.0):
-  ```bash
-  python experiments/run_evaluation.py --use-mock --vulnerability 0.8
-  ```
+You can also adjust how "vulnerable" the mock system is (0.0 = secure, 1.0 = always accepts attacks):
+
+```bash
+# Simulate a highly vulnerable model (default is usually 0.5-0.7)
+python experiments/run_evaluation.py --use-mock --vulnerability 0.9
+```
+
+### Other Options
 
 - **Specify Output Directory**:
   ```bash
-  python experiments/run_evaluation.py --output-dir my_results
+  python experiments/run_evaluation.py --output-dir my_custom_results
+  ```
+- **Set Random Seed**:
+  ```bash
+  python experiments/run_evaluation.py --seed 123
   ```
 
 ## License
